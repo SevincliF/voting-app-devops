@@ -1,0 +1,76 @@
+services:
+  vote:
+    build: ./vote
+    restart: unless-stopped
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+    ports:
+      - "8080:8080"
+    networks:
+      - voting-network
+    depends_on:
+      redis:
+        condition: service_healthy
+  result:
+    build: ./result
+    restart: unless-stopped
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "4000:4000"
+    networks:
+      - voting-network
+    depends_on:
+      db:
+        condition: service_healthy
+  worker:
+    build: ./worker
+    restart: unless-stopped
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST}
+    networks:
+      - voting-network
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    networks:
+      - voting-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    networks:
+      - voting-network
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+volumes:
+  db-data:
+    name: db-data
+    external: true
+networks:
+  voting-network:

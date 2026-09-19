@@ -1,0 +1,6 @@
+bin/
+obj/
+.env
+Dockerfile
+.dockerignore
+.DS_Store

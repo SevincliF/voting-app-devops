@@ -17,8 +17,20 @@ io.on('connection', function (socket) {
   });
 });
 
+var dbHost = process.env.DB_HOST;
+var dbName = process.env.DB_NAME;
+var dbUser = process.env.DB_USER;
+var dbPassword = process.env.DB_PASSWORD;
+
+if (!dbHost || !dbName || !dbUser || !dbPassword) {
+  throw new Error('Database environment variables are not set');
+}
+
 var pool = new Pool({
-  connectionString: 'postgres://postgres:postgres@db/postgres'
+  host: dbHost,
+  database: dbName,
+  user: dbUser,
+  password: dbPassword
 });
 
 async.retry(
