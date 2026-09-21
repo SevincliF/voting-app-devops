@@ -1,7 +1,7 @@
 vote:
   replicaCount: 2
   image:
-    repository: voting-app-vote
+    repository: ghcr.io/sevinclif/voting-app-vote
     tag: v2
   service:
     type: ClusterIP
@@ -11,7 +11,7 @@ vote:
 result:
   replicaCount: 2
   image:
-    repository: voting-app-result
+    repository: ghcr.io/sevinclif/voting-app-result
     tag: v2
   containerPort: 4000
   service:
@@ -21,7 +21,7 @@ result:
 worker:
   replicaCount: 1
   image:
-    repository: voting-app-worker
+    repository: ghcr.io/sevinclif/voting-app-worker
     tag: v2
 
 redis:
