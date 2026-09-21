@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: voting-app-ingress
+  namespace: {{ .Release.Namespace }}
+spec:
+  ingressClassName: {{ .Values.ingress.ingressClass | quote }}
+  rules:
+    - host: {{ .Values.ingress.vote.host | quote }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: vote-service
+                port:
+                  number: {{ .Values.vote.service.port }}
+            pathType: {{ .Values.ingress.vote.pathType | quote }}
+            path: {{ .Values.ingress.vote.path | quote }}
+    - host: {{ .Values.ingress.result.host | quote }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: result-service
+                port:
+                  number: {{ .Values.result.service.port }}
+            pathType: {{ .Values.ingress.result.pathType | quote }}
+            path: {{ .Values.ingress.result.path | quote }}

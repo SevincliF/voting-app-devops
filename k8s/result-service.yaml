@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: result-service
+  namespace: voting-app
+spec:
+  type: ClusterIP
+  selector:
+    app: result
+  ports:
+    - port: 4000
+      targetPort: 4000

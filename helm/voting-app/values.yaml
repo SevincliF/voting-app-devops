@@ -1,0 +1,67 @@
+vote:
+  replicaCount: 2
+  image:
+    repository: voting-app-vote
+    tag: v2
+  service:
+    type: ClusterIP
+    port: 8080
+  containerPort: 8080
+
+result:
+  replicaCount: 2
+  image:
+    repository: voting-app-result
+    tag: v2
+  containerPort: 4000
+  service:
+    type: ClusterIP
+    port: 4000
+
+worker:
+  replicaCount: 1
+  image:
+    repository: voting-app-worker
+    tag: v2
+
+redis:
+  replicaCount: 1
+  image:
+    repository: redis
+    tag: alpine
+  containerPort: 6379
+  service:
+    type: ClusterIP
+    port: 6379
+
+postgres:
+  replicaCount: 1
+  image:
+    repository: postgres
+    tag: 15-alpine
+  containerPort: 5432
+  service:
+    type: ClusterIP
+    port: 5432
+  pvc:
+    storage: 1Gi
+
+config:
+  dbHost: db
+  dbName: postgres
+  dbUser: postgres
+  redisHost: redis
+
+ingress:
+  ingressClass: nginx
+  vote:
+    host: vote.voting-app.test
+    path: /
+    pathType: Prefix
+  result:
+    host: result.voting-app.test
+    path: /
+    pathType: Prefix
+
+secret:
+  name: voting-app-secret

@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.postgres.replicaCount }}
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: "{{ .Values.postgres.image.repository }}:{{ .Values.postgres.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.postgres.containerPort }}
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_USER
+                  name: voting-app-config
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_NAME
+                  name: voting-app-config
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: DB_PASSWORD
+                  name: {{ .Values.secret.name }}
+      volumes:
+        - name: postgres
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+    
